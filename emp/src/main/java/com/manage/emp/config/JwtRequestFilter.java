@@ -1,9 +1,7 @@
 package com.manage.emp.config;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -12,7 +10,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.manage.emp.util.JwtUtil;
 
-import java.io.IOException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -38,7 +39,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         // Verify the token and set the authentication in the context if valid
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null && jwtUtil.validateToken(token, username)) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null && jwtUtil.validateToken(token,username )) {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(username, null, this.jwtUtil.getRolesFromToken(token));
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

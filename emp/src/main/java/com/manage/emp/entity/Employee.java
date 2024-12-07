@@ -31,7 +31,7 @@ public class Employee {
     private UUID id;
     private String name;
     @Email(message = "Please provide a valid email address")
-    private Integer employee_id;
+    private Integer employeeId;
     private String email;
     private String department;
     private Long mobileNo;

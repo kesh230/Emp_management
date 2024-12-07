@@ -21,7 +21,7 @@ public class SpringSecurityconfig {
     private JwtRequestFilter jwtRequestFilter;
     
 
-    public SpringSecurityconfig(JwtUtil jwtUtil, JwtRequestFilter jwtRequestFilter) {
+    public SpringSecurityconfig(JwtUtil jwtUtil,JwtRequestFilter jwtRequestFilter) {
         this.jwtUtil = jwtUtil;
         this.jwtRequestFilter = jwtRequestFilter;
     }
@@ -29,13 +29,14 @@ public class SpringSecurityconfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(auth->auth.requestMatchers("/company/it/**").hasRole("IT")
+        http.authorizeHttpRequests(auth->auth
+                             .requestMatchers("/employee/**").permitAll() 
+                             .requestMatchers("/company/it/**").hasRole("IT")
                              .requestMatchers("/company/sales/**").hasRole("SALES")
-                             .requestMatchers("/employee/**").permitAll()  
                              .anyRequest().authenticated())
                              .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();                    
-           }
+                              return http.build(); 
+                  }
   @Bean
   public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
            return authenticationConfiguration.getAuthenticationManager();

@@ -9,34 +9,38 @@ import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
-@Service
+@Component
+@Slf4j
 public class JwtUtil {
 
-    private final String secretKey = "rT3sN8oG0I7qPz5tF6uCzQ4fH3zYxWvO3k5JkS1A8P3yA9E8y+7b3mT2E5t8w==";
-
+    @Value("${jwt.secret.key}")
+    private String secretKey;
+    
     public String generateToken(User user) {
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", user.getAuthorities().stream()
                 .map(t -> t.getAuthority())
                 .collect(Collectors.toList()));
-        
+               
         return Jwts
                 .builder()
                 .claims(claims)
                 .subject(user.getUsername())
                 .issuer("DCB")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 10 * 1000000)) // Expiration time in milliseconds
+                .expiration(new Date(System.currentTimeMillis() + 360000)) // Expiration time in milliseconds
                 .signWith(generateKey())
                 .compact();
     }
@@ -56,6 +60,7 @@ public class JwtUtil {
     }
 
     private Claims extractClaims(String token) {
+      log.info("Inside extract claims");
         return Jwts
                 .parser()
                 .verifyWith(generateKey())
@@ -65,23 +70,12 @@ public class JwtUtil {
     }
     
 
-
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
-
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
         return extractClaims(token, Claims::getExpiration);
-    }
-
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = this.extractUserName(token);
-        return (username.equals(userDetails.getUsername()) && !this.isTokenExpired(token));
     }
 
     public boolean validateToken(String token, String username) {
@@ -100,4 +94,3 @@ public class JwtUtil {
                 .collect(Collectors.toList());
     }
 }
-

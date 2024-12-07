@@ -13,4 +13,5 @@ import com.manage.emp.entity.Employee;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee,UUID> {
     public Optional<Employee> getEmployeeByEmail(String email);
+    public Optional<Employee> findByEmployeeId(Integer employeeId);
 }
